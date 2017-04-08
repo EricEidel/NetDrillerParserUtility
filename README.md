@@ -78,7 +78,7 @@ java -jar Parser.jar <MODE_PARAMETER> <INPUT_FILE_NAME> [Optional: <OUTPUT_FILE_
         ]
     }
 ]
-'''
+```
 
 # Full usage example:
 java -jar Parser.jar 1 input.json

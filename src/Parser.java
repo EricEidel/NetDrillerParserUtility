@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.json.simple.JSONArray;
@@ -117,19 +118,19 @@ public class Parser
 		{
 			// Do the co-authored papers mode
 			System.out.println("Creating a dataset based on co-authored papers: " + output_name);
-			do_co_authors(output_file);
+			do_co_authors(output_file, papers);
 		}
 		else if (mode == TILTES_AND_KEYWORDS_MODE)
 		{
 			// Do the titles and keywords mode
 			System.out.println("Creating a dataset based on titles and keywords: " + output_name);
-			do_titles_and_keywords(output_file);
+			do_titles_and_keywords(output_file, papers);
 		}
 		else if (mode == AUTHORS_AND_KEYWORDS_MODE)
 		{
 			// Do the authors and keywords mode
 			System.out.println("Creating a dataset based on authors and titles: " + output_name);
-			do_authors_and_keywords(output_file);
+			do_authors_and_keywords(output_file, papers);
 		}
 		else
 		{
@@ -140,13 +141,72 @@ public class Parser
 	
 	/***
 	 * 
-	 * @param output_file - This is the file to which the resulting dataset will be written in a csv foramt.
+	 * This method creates a dataset for a weighted graph.
+	 * 
+	 * Nodes are authors and edges between nodes indicate co-authored papers. 
+	 * The weight of the edge is the number of such co-authored papers.
+	 * 
+	 * @param output_file - This is the file to which the resulting dataset will be written in a csv format.
+	 * @param papers - An ArrayList of all the Paper(s) (container class for input) that were provided as input.
+	 * 
 	 */
-	private static void do_co_authors(File output_file)
+	private static void do_co_authors(File output_file, List<Paper> papers)
 	{
 		try
 		{
+			//TODO: Implement part 1 of the assignment
+			// A hashtable where the key is an author name and the value is a list with all the co-author names. 
+			// Repeated names of co-authors are allowed and will be determining the weight of an edge at the end. 
+			Hashtable<String, Hashtable<String, Integer>> golbal_map = new Hashtable<String, Hashtable<String, Integer>>(); 
 			
+			for(Paper paper : papers)
+			{
+				for(String author : paper.authors)
+				{
+					// For every author in the authors of any given paper
+					ArrayList<String> co_authors = new ArrayList<String>();
+					co_authors.addAll(paper.authors);
+					co_authors.remove(author);
+					
+					// This hashtable counts how many times each co_author appeared for each author
+					Hashtable<String, Integer> all_co_authors_counter = new Hashtable<String, Integer>();
+					
+					// Add the occurrence of this co-authorship into the global map
+					for(String co_author : co_authors)
+					{
+						// Check if this isn't the first time we see this author - get the old counter if so
+						if (golbal_map.containsKey(author))
+						{
+							all_co_authors_counter = golbal_map.get(author);
+						}
+						
+						// Check how many this co-authoer appeared for this author - if it's null, this is the first time
+						Integer num_of_co_authored_papers = all_co_authors_counter.get(co_author);
+						int new_num = 1;
+						if (num_of_co_authored_papers != null)
+						{
+							new_num = num_of_co_authored_papers + 1;
+						}
+						
+						all_co_authors_counter.put(co_author, new Integer(new_num));	
+					}
+					
+					// Update the global counter for this give author
+					golbal_map.put(author, all_co_authors_counter);
+				}
+			}
+			
+			// Display number of co-authors for each author
+			for(String author : golbal_map.keySet())
+			{
+				System.out.println("For the author " + author);
+				
+				Hashtable<String, Integer> co_author_counts = golbal_map.get(author);
+				for(String co_author : co_author_counts.keySet())
+				{
+					System.out.println("\t" + co_author + " has co-authored " + co_author_counts.get(co_author) + " papers.");
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -157,14 +217,21 @@ public class Parser
 	}
 	
 	/***
+	 * 	 
+	 * This method creates a dataset for a weighted graph.
 	 * 
-	 * @param output_file - This is the file to which the resulting dataset will be written in a csv foramt.
+	 * Nodes are keywords of papers and edges between nodes are co-occurrences of these keywords in papers.
+	 * The weight of the edge indicates the number of times these two keywords co-occurred.
+	 * 
+	 * @param output_file - This is the file to which the resulting dataset will be written in a csv format.
+	 * @param papers - An ArrayList of all the Paper(s) (container class for input) that were provided as input.
+	 * 
 	 */
-	private static void do_titles_and_keywords(File output_file)
+	private static void do_titles_and_keywords(File output_file, List<Paper> papers)
 	{
 		try
 		{
-			
+			//TODO: Implement part 2 of the assignment
 		}
 		catch (Exception e)
 		{
@@ -175,14 +242,21 @@ public class Parser
 	}
 	
 	/***
+	 * This method creates a dataset for a two-mode weighted graph.
 	 * 
-	 * @param output_file - This is the file to which the resulting dataset will be written in a csv foramt.
+	 * Nodes of the first type are authors. Nodes of the second type are keywords.
+	 * Edges between the two types of nodes are keywords in papers that authors wrote.
+	 * The weight of the edge indicates the number of times the author has used the connected keyword.
+	 * 
+	 * @param output_file - This is the file to which the resulting dataset will be written in a csv format.
+	 * @param papers - An ArrayList of all the Paper(s) (container class for input) that were provided as input.
+	 * 
 	 */
-	private static void do_authors_and_keywords(File output_file)
+	private static void do_authors_and_keywords(File output_file, List<Paper> papers)
 	{
 		try
 		{
-			
+			//TODO: Implement part 3 of the assignment
 		}
 		catch (Exception e)
 		{

@@ -14,10 +14,11 @@ public class Paper
 	 */
 	
 	public ArrayList<String> authors;
+	public ArrayList<String> key_words;
+	
 	public String title;
 	public String venue;
 	public String year;
-	public ArrayList<String> key_words;
 	
 	public Paper(JSONObject j_obj) throws Exception
 	{

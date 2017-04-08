@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -22,6 +23,10 @@ import org.json.simple.parser.ParseException;
  *	These requirements are outlined under the print_instructions method.
  *	This is the work of our assignment 2 for the CPSC 572/672 in the University of Calgary for the Winter 2017 Semester.
  *	Course instructor: Dr. Rokne
+ *
+ *	Additional comments:
+ *	In order to produce the least amount of duplicated nodes we have converted all keywords and author names to upper case in the parsing of the papers.
+ *	Take a look at the Paper.java constructor to change this behavior.
  *
  */
 public class Parser 
@@ -154,15 +159,19 @@ public class Parser
 	{
 		try
 		{
-			//TODO: Implement part 1 of the assignment
-			// A hashtable where the key is an author name and the value is a list with all the co-author names. 
-			// Repeated names of co-authors are allowed and will be determining the weight of an edge at the end. 
+			// A hashtable where the key is an author and the value is a counter hashtable 
+			// In the counter hashtable the co-authors names are the keys and their occurrences are the values.  
 			Hashtable<String, Hashtable<String, Integer>> golbal_map = new Hashtable<String, Hashtable<String, Integer>>(); 
+			
+			// This is used to generate the output file
+			HashSet<String> all_authors = new HashSet<String>();
 			
 			for(Paper paper : papers)
 			{
 				for(String author : paper.authors)
 				{
+					all_authors.add(author);
+					
 					// For every author in the authors of any given paper
 					ArrayList<String> co_authors = new ArrayList<String>();
 					co_authors.addAll(paper.authors);
@@ -207,6 +216,11 @@ public class Parser
 					System.out.println("\t" + co_author + " has co-authored " + co_author_counts.get(co_author) + " papers.");
 				}
 			}
+			
+			// TODO: Output the global_map to a CSV file that  is formatted like the task_1_example_output.csv file in the example_graphs folder.
+			
+			// TODO: Double check the given output file loads properly in NetDriller.
+			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 		catch (Exception e)
 		{
@@ -231,7 +245,68 @@ public class Parser
 	{
 		try
 		{
-			//TODO: Implement part 2 of the assignment
+			// A hashtable where the key is a keyword and the value is a counter hashtable 
+			// In the counter hashtable the co-keywords are the keys and their occurrences are the values. 
+			Hashtable<String, Hashtable<String, Integer>> golbal_map = new Hashtable<String, Hashtable<String, Integer>>(); 
+			
+			// This is used to generate the output file
+			HashSet<String> all_keywords = new HashSet<String>();
+			
+			for(Paper paper : papers)
+			{
+				for(String keyword : paper.key_words)
+				{
+					all_keywords.add(keyword);
+					
+					// For every author in the authors of any given paper
+					ArrayList<String> co_keywords = new ArrayList<String>();
+					co_keywords.addAll(paper.key_words);
+					co_keywords.remove(keyword);
+					
+					// This hashtable counts how many times each co_keywords appeared for each keyword
+					Hashtable<String, Integer> all_co_keywords_counter = new Hashtable<String, Integer>();
+					
+					// Add the occurrence of this co-authorship into the global map
+					for(String co_keyword : co_keywords)
+					{
+						// Check if this isn't the first time we see this keyword - get the old counter if so
+						if (golbal_map.containsKey(keyword))
+						{
+							all_co_keywords_counter = golbal_map.get(keyword);
+						}
+						
+						// Check how many this co-keyword appeared for this keyword - if it's null, this is the first time
+						Integer num_of_co_keywords = all_co_keywords_counter.get(co_keyword);
+						int new_num = 1;
+						if (num_of_co_keywords != null)
+						{
+							new_num = num_of_co_keywords + 1;
+						}
+						
+						all_co_keywords_counter.put(co_keyword, new Integer(new_num));	
+					}
+					
+					// Update the global counter for this give author
+					golbal_map.put(keyword, all_co_keywords_counter);
+				}
+			}
+			
+			// Display number of co-keywords for each keyword
+			for(String keyword : golbal_map.keySet())
+			{
+				System.out.println("For the keyword " + keyword);
+				
+				Hashtable<String, Integer> co_keywords_counts = golbal_map.get(keyword);
+				for(String co_keyword : co_keywords_counts.keySet())
+				{
+					System.out.println("\t" + co_keyword + " has co-keyworded in " + co_keywords_counts.get(co_keyword) + " papers.");
+				}
+			}
+			
+			// TODO: Output the global_map to a CSV file that is formatted like the task_2_example_output.csv file in the example_graphs folder.
+			
+			// TODO: Double check the given output file loads properly in NetDriller.
+			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 		catch (Exception e)
 		{
@@ -256,7 +331,70 @@ public class Parser
 	{
 		try
 		{
-			//TODO: Implement part 3 of the assignment
+			// A hashtable where the key is an author and the value is a counter hashtable 
+			// In the counter hashtable the keywords are the keys and their occurrences are the values. 
+			Hashtable<String, Hashtable<String, Integer>> golbal_map = new Hashtable<String, Hashtable<String, Integer>>(); 
+			
+			// These are used to generate the output file
+			HashSet<String> all_authors = new HashSet<String>();
+			HashSet<String> all_keywords = new HashSet<String>();
+			
+			for(Paper paper : papers)
+			{
+				for(String author : paper.authors)
+				{
+					all_authors.add(author);
+					
+					// For every author in the authors of any given paper
+					ArrayList<String> keywords = new ArrayList<String>();
+					keywords.addAll(paper.key_words);
+					
+					// This hashtable counts how many times each keyword appeared for each author
+					Hashtable<String, Integer> all_keywords_counter = new Hashtable<String, Integer>();
+					
+					// Add the occurrence of this  into the global map
+					for(String keyword : keywords)
+					{
+						all_keywords.add(keyword);
+						
+						// Check if this isn't the first time we see this keyword - get the old counter if so
+						if (golbal_map.containsKey(author))
+						{
+							all_keywords_counter = golbal_map.get(author);
+						}
+						
+						// Check how many this keyword appeared for this author - if it's null, this is the first time
+						Integer num_of_keywords = all_keywords_counter.get(keyword);
+						int new_num = 1;
+						if (num_of_keywords != null)
+						{
+							new_num = num_of_keywords + 1;
+						}
+						
+						all_keywords_counter.put(keyword, new Integer(new_num));	
+					}
+					
+					// Update the global counter for this give author
+					golbal_map.put(author, all_keywords_counter);
+				}
+			}
+			
+			// Display number of keywords for each author
+			for(String author : golbal_map.keySet())
+			{
+				System.out.println("For the author named " + author + " we had the following keywords:");
+				
+				Hashtable<String, Integer> keywords_counts = golbal_map.get(author);
+				for(String keyword : keywords_counts.keySet())
+				{
+					System.out.println("\tThe keyword '" + keyword + "' has appeared in " + keywords_counts.get(keyword) + " papers.");
+				}
+			}
+			
+			// TODO: Output the global_map to a CSV file that is formatted like the task_2_example_output.csv file in the example_graphs folder.
+			
+			// TODO: Double check the given output file loads properly in NetDriller.
+			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 		catch (Exception e)
 		{

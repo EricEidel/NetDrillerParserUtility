@@ -36,14 +36,14 @@ public class Paper
 		for (Object author_obj : authors_arr)
 		{
 			String author = (String)author_obj;
-			this.authors.add(author);
+			this.authors.add(author.toUpperCase());
 		}
 		
 		JSONArray key_wrods_arr = (JSONArray) j_obj.get("keywords");
 		for (Object key_word_obj : key_wrods_arr)
 		{
 			String key_word = (String)key_word_obj;
-			this.key_words.add(key_word);
+			this.key_words.add(key_word.toUpperCase());
 		}
 	}
 

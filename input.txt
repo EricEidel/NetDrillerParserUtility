@@ -40,11 +40,6 @@
 		"year":"1971",
 		"keywords":["Global unconstrained optimization",
 					"global constrained optimization",
-					"interval tools",
-					"interval Newton method",
-					"interval Gauss-Seidel method",
-					"bisections",
-					"accelerating devices",
-					"termination criteria"]
+					"interval tools"]
 	}
 ]

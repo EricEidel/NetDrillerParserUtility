@@ -249,15 +249,9 @@ public class Parser
 				for(String co_author : co_author_counts.keySet())
 				{
 					writer.append(",");
-					int x = co_author_counts.get(co_author);
-					if (x == 0)
-					{	
-						writer.append(String.valueOf(0));
-					}
-					else
-					{
-						writer.append(String.valueOf(co_author_counts.get(co_author)));
-					}
+					writer.append("\"\t");
+					writer.append(String.valueOf(co_author_counts.get(co_author)));
+					writer.append("\"");
 				}
 				
 				writer.append("\n");

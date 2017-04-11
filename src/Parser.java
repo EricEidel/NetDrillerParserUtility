@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -217,7 +219,65 @@ public class Parser
 				}
 			}
 			
-			// TODO: Output the global_map to a CSV file that  is formatted like the task_1_example_output.csv file in the example_graphs folder.
+			// Write CSV file
+			
+			FileWriter writer = null;
+			writer = new FileWriter(output_file);
+			
+			// Setup top row
+			
+			for (String author : golbal_map.keySet())
+			{
+				writer.append(",");
+				writer.append("\"");
+				writer.append(author);
+				writer.append("\"");
+			}
+			
+			writer.append("\n");
+			
+			// Fill the rest of the CSV file
+			
+			for (String author: golbal_map.keySet())
+			{
+
+				writer.append("\"");
+				writer.append(author);
+				writer.append("\"");
+				
+				Hashtable<String, Integer> co_author_counts = golbal_map.get(author);
+				for(String co_author : co_author_counts.keySet())
+				{
+					writer.append(",");
+					int x = co_author_counts.get(co_author);
+					if (x == 0)
+					{	
+						writer.append(String.valueOf(0));
+					}
+					else
+					{
+						writer.append(String.valueOf(co_author_counts.get(co_author)));
+					}
+				}
+				
+				writer.append("\n");
+			}
+			
+			System.out.println("CSV file was created.");
+		
+			// Close writer
+			
+			 try 
+			 {
+				 writer.flush();
+				 writer.close();
+			 } 
+			 catch (IOException e) 
+			 {
+				 System.out.println("Error while close writer.");
+				 e.printStackTrace();
+			 }
+
 			
 			// TODO: Double check the given output file loads properly in NetDriller.
 			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
@@ -303,7 +363,56 @@ public class Parser
 				}
 			}
 			
-			// TODO: Output the global_map to a CSV file that is formatted like the task_2_example_output.csv file in the example_graphs folder.
+			// Write CSV file
+			
+			FileWriter writer = null;
+			writer = new FileWriter(output_file);
+			
+			// Setup top row
+			
+			for (String keyword : golbal_map.keySet())
+			{
+				writer.append(",");
+				writer.append("\"");
+				writer.append(keyword);
+				writer.append("\"");
+			}
+			
+			writer.append("\n");
+			
+			// Fill the rest of the CSV file
+			
+			for (String keyword: golbal_map.keySet())
+			{
+
+				writer.append("\"");
+				writer.append(keyword);
+				writer.append("\"");
+				
+				Hashtable<String, Integer> co_keywords_counts = golbal_map.get(keyword);
+				for(String co_keyword : co_keywords_counts.keySet())
+				{
+					writer.append(",");
+					writer.append(String.valueOf(co_keywords_counts.get(co_keyword)));
+				}
+				
+				writer.append("\n");
+			}
+			
+			System.out.println("CSV file was created.");
+		
+			// Close writer
+			
+			 try 
+			 {
+				 writer.flush();
+				 writer.close();
+			 } 
+			 catch (IOException e) 
+			 {
+				 System.out.println("Error while close writer.");
+				 e.printStackTrace();
+			 }
 			
 			// TODO: Double check the given output file loads properly in NetDriller.
 			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
@@ -391,11 +500,64 @@ public class Parser
 				}
 			}
 			
-			// TODO: Output the global_map to a CSV file that is formatted like the task_2_example_output.csv file in the example_graphs folder.
+			// Write CSV file
+			
+			FileWriter writer = null;
+			writer = new FileWriter(output_file);
+			
+			// Setup top row
+			
+			for (String author : golbal_map.keySet())
+			{
+				writer.append(",");
+				writer.append("\"");
+				writer.append(author);
+				writer.append("\"");
+			}
+			
+			writer.append("\n");
+			
+			// Fill the rest of the CSV file
+			
+			for (String author: golbal_map.keySet())
+			{
+				Hashtable<String, Integer> keywords_counts = golbal_map.get(author);
+				for(String keyword_for_column : keywords_counts.keySet())
+				{
+					writer.append("\"");
+					writer.append(keyword_for_column);
+					writer.append("\"");
+					
+					for(String keyword : keywords_counts.keySet())
+					{
+						writer.append(",");
+						writer.append(String.valueOf(keywords_counts.get(keyword)));
+					}
+				}
+				
+				writer.append("\n");
+			}
+			
+			System.out.println("CSV file was created.");
+		
+			// Close writer
+			
+			 try 
+			 {
+				 writer.flush();
+				 writer.close();
+			 } 
+			 catch (IOException e) 
+			 {
+				 System.out.println("Error while close writer.");
+				 e.printStackTrace();
+			 }
 			
 			// TODO: Double check the given output file loads properly in NetDriller.
 			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
+
+			
 		catch (Exception e)
 		{
 			System.out.println("Was not able to write to output file. Please check the file can be created!");

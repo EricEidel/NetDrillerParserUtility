@@ -1,7 +1,8 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -36,6 +37,8 @@ public class Parser
 	public static int COAUTHORED_PAPERS_MODE = 1;
 	public static int TILTES_AND_KEYWORDS_MODE = 2;
 	public static int AUTHORS_AND_KEYWORDS_MODE = 3;
+	
+	public static boolean DEBUG = false; // Set this to true to see print-out of all the global-maps in all modes.
 	
 	/***
 	 * @param args[0] - <MODE_PARAMETER>, an integer with the value of 1, 2 or 3
@@ -207,73 +210,24 @@ public class Parser
 				}
 			}
 			
-			// Display number of co-authors for each author
-			for(String author : golbal_map.keySet())
+			// Display number of co-authors for each author if DEBUG is set on
+			if (DEBUG)
 			{
-				System.out.println("For the author " + author);
-				
-				Hashtable<String, Integer> co_author_counts = golbal_map.get(author);
-				for(String co_author : co_author_counts.keySet())
+				for(String author : golbal_map.keySet())
 				{
-					System.out.println("\t" + co_author + " has co-authored " + co_author_counts.get(co_author) + " papers.");
+					System.out.println("For the author " + author);
+					
+					Hashtable<String, Integer> co_author_counts = golbal_map.get(author);
+					for(String co_author : co_author_counts.keySet())
+					{
+						System.out.println("\t" + co_author + " has co-authored " + co_author_counts.get(co_author) + " papers.");
+					}
 				}
 			}
+			// Write the file out
+			write_out(golbal_map, all_authors, all_authors, output_file);
 			
-			// Write CSV file
-			
-			FileWriter writer = null;
-			writer = new FileWriter(output_file);
-			
-			// Setup top row
-			
-			for (String author : golbal_map.keySet())
-			{
-				writer.append(",");
-				writer.append("\"");
-				writer.append(author);
-				writer.append("\"");
-			}
-			
-			writer.append("\n");
-			
-			// Fill the rest of the CSV file
-			
-			for (String author: golbal_map.keySet())
-			{
-
-				writer.append("\"");
-				writer.append(author);
-				writer.append("\"");
-				
-				Hashtable<String, Integer> co_author_counts = golbal_map.get(author);
-				for(String co_author : co_author_counts.keySet())
-				{
-					writer.append(",");
-					writer.append("\"\t");
-					writer.append(String.valueOf(co_author_counts.get(co_author)));
-					writer.append("\"");
-				}
-				
-				writer.append("\n");
-			}
-			
-			System.out.println("CSV file was created.");
-		
-			// Close writer
-			
-			 try 
-			 {
-				 writer.flush();
-				 writer.close();
-			 } 
-			 catch (IOException e) 
-			 {
-				 System.out.println("Error while close writer.");
-				 e.printStackTrace();
-			 }
-
-			
-			// TODO: Double check the given output file loads properly in NetDriller.
+			// The given output file should loads properly in NetDriller.
 			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 		catch (Exception e)
@@ -345,70 +299,25 @@ public class Parser
 				}
 			}
 			
-			// Display number of co-keywords for each keyword
-			for(String keyword : golbal_map.keySet())
+			// Display number of co-keywords for each keyword if DEBUG is set on
+			if (DEBUG)
 			{
-				System.out.println("For the keyword " + keyword);
-				
-				Hashtable<String, Integer> co_keywords_counts = golbal_map.get(keyword);
-				for(String co_keyword : co_keywords_counts.keySet())
+				for(String keyword : golbal_map.keySet())
 				{
-					System.out.println("\t" + co_keyword + " has co-keyworded in " + co_keywords_counts.get(co_keyword) + " papers.");
+					System.out.println("For the keyword " + keyword);
+					
+					Hashtable<String, Integer> co_keywords_counts = golbal_map.get(keyword);
+					for(String co_keyword : co_keywords_counts.keySet())
+					{
+						System.out.println("\t" + co_keyword + " has co-keyworded in " + co_keywords_counts.get(co_keyword) + " papers.");
+					}
 				}
 			}
 			
-			// Write CSV file
+			// Write the file out
+			write_out(golbal_map, all_keywords, all_keywords, output_file);
 			
-			FileWriter writer = null;
-			writer = new FileWriter(output_file);
-			
-			// Setup top row
-			
-			for (String keyword : golbal_map.keySet())
-			{
-				writer.append(",");
-				writer.append("\"");
-				writer.append(keyword);
-				writer.append("\"");
-			}
-			
-			writer.append("\n");
-			
-			// Fill the rest of the CSV file
-			
-			for (String keyword: golbal_map.keySet())
-			{
-
-				writer.append("\"");
-				writer.append(keyword);
-				writer.append("\"");
-				
-				Hashtable<String, Integer> co_keywords_counts = golbal_map.get(keyword);
-				for(String co_keyword : co_keywords_counts.keySet())
-				{
-					writer.append(",");
-					writer.append(String.valueOf(co_keywords_counts.get(co_keyword)));
-				}
-				
-				writer.append("\n");
-			}
-			
-			System.out.println("CSV file was created.");
-		
-			// Close writer
-			
-			 try 
-			 {
-				 writer.flush();
-				 writer.close();
-			 } 
-			 catch (IOException e) 
-			 {
-				 System.out.println("Error while close writer.");
-				 e.printStackTrace();
-			 }
-			
-			// TODO: Double check the given output file loads properly in NetDriller.
+			// The given output file should loads properly in NetDriller.
 			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 		catch (Exception e)
@@ -482,73 +391,26 @@ public class Parser
 				}
 			}
 			
-			// Display number of keywords for each author
-			for(String author : golbal_map.keySet())
+			// Display number of keywords for each author if DEBUG is on
+			if (DEBUG)
 			{
-				System.out.println("For the author named " + author + " we had the following keywords:");
-				
-				Hashtable<String, Integer> keywords_counts = golbal_map.get(author);
-				for(String keyword : keywords_counts.keySet())
+				for(String author : golbal_map.keySet())
 				{
-					System.out.println("\tThe keyword '" + keyword + "' has appeared in " + keywords_counts.get(keyword) + " papers.");
-				}
-			}
-			
-			// Write CSV file
-			
-			FileWriter writer = null;
-			writer = new FileWriter(output_file);
-			
-			// Setup top row
-			
-			for (String author : golbal_map.keySet())
-			{
-				writer.append(",");
-				writer.append("\"");
-				writer.append(author);
-				writer.append("\"");
-			}
-			
-			writer.append("\n");
-			
-			// Fill the rest of the CSV file
-			
-			for (String author: golbal_map.keySet())
-			{
-				Hashtable<String, Integer> keywords_counts = golbal_map.get(author);
-				for(String keyword_for_column : keywords_counts.keySet())
-				{
-					writer.append("\"");
-					writer.append(keyword_for_column);
-					writer.append("\"");
+					System.out.println("For the author named " + author + " we had the following keywords:");
 					
+					Hashtable<String, Integer> keywords_counts = golbal_map.get(author);
 					for(String keyword : keywords_counts.keySet())
 					{
-						writer.append(",");
-						writer.append(String.valueOf(keywords_counts.get(keyword)));
+						System.out.println("\tThe keyword '" + keyword + "' has appeared in " + keywords_counts.get(keyword) + " papers.");
 					}
 				}
-				
-				writer.append("\n");
 			}
 			
-			System.out.println("CSV file was created.");
-		
-			// Close writer
+			// Write the file out
+			write_out(golbal_map, all_keywords, all_authors, output_file);
 			
-			 try 
-			 {
-				 writer.flush();
-				 writer.close();
-			 } 
-			 catch (IOException e) 
-			 {
-				 System.out.println("Error while close writer.");
-				 e.printStackTrace();
-			 }
-			
-			// TODO: Double check the given output file loads properly in NetDriller.
-			// To do so, under import graph, choose "One Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
+			// The given output file should loads properly in NetDriller.
+			// To do so, under import graph, choose "Two Mode", "Undirected", "CSV file" and mark the "The file contains headers" checkbox. 
 		}
 
 			
@@ -557,6 +419,67 @@ public class Parser
 			System.out.println("Was not able to write to output file. Please check the file can be created!");
 			e.getMessage();
 			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * 
+	 * This method writes out a CSV file.
+	 * 
+	 * @param golbal_map - this is the global map with the relationships from one of the three methods above
+	 * @param column_headers - These are the unique column headers (keywords or authors)
+	 * @param row_start - These are the unique rows (keywords or authors)
+	 * @param output_file - This is the output file that was opened when the utility was validating user parameters input.
+	 */
+	
+	public static void write_out(Hashtable<String, Hashtable<String, Integer>> golbal_map, HashSet<String> column_headers, HashSet<String> row_start, File output_file )
+	{		
+		try 
+		{
+			// Write CSV file
+			FileWriter writer = new FileWriter(output_file, false); // Overwrites any other output file!
+			BufferedWriter bw = new BufferedWriter(writer);
+			
+			// Create all the columns
+			for (String column_heading : column_headers)
+			{
+				bw.write("," + column_heading.replaceAll(",", ""));
+			}
+			bw.newLine();
+			
+			// Fill the rest of the CSV file
+			for (String row_heading : row_start)
+			{
+	
+				bw.write(row_heading.replaceAll(",", ""));
+				
+				Hashtable<String, Integer> items_with_relationship = golbal_map.get(row_heading);
+				for (String column_heading : column_headers)
+				{
+					Integer value = items_with_relationship.get(column_heading);
+					if (value == null)
+					{
+						value = 0;
+					}
+					
+					bw.write("," + value.toString());
+				}
+				
+				bw.newLine();
+			}
+			
+			System.out.println("CSV file was created successfuly at " + output_file.getAbsolutePath());
+		
+			// Close writers
+	
+			 bw.flush();
+			 bw.close();
+			 writer.close();
+		}
+		 catch (IOException e1) 
+		{
+			System.out.println("Error opening writer for the file. Please make sure the file path has permissions to write.");
+			System.exit(0);
 		}
 	}
 	
